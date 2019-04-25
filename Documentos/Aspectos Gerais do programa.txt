@@ -1,0 +1,12 @@
+Deverá guardar todos os dados em um banco de dados.
+deverá fazer calculos matemáticos para exibir ao usuário.
+
+- deverá constar o mes
+- o ano
+- os itens
+- o valor do item
+- a porcentagem do valor do item relacionado ao total recebido
+- o total recebido
+- a sobra total
+- a porcentagem da sobra do total
+- 

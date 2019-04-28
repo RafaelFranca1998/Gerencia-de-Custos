@@ -2,9 +2,15 @@ package com.gerencia.core;
 
 public class Month {
 	
-	private String month;
+	public static final String[] MONTHLIST = {"Janeiro","Fevereiro","Março","Abril",
+											  "Maio","Junho","Julho","Agosto","Setembro",
+											  "Outubro","Novembro","Dezembro"};
+	private int idMonth;
+	private int idYear;
 	private int received;
 	private int prervious;
+	private String month;
+	
 	
 	public String getMonth() {
 		return month;
@@ -24,7 +30,15 @@ public class Month {
 	public void setPrervious(int prervious) {
 		this.prervious = prervious;
 	}
+	public int getIdMonth() {
+		return idMonth;
+	}
 	
-
-	
+	public int getIdYear() {
+		return idYear;
+	}
+	public void setIdYear(int idYear) {
+		this.idYear = idYear;
+	}
+		
 }

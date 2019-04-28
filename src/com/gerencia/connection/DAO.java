@@ -16,7 +16,7 @@ public class DAO {
 
 	
 	public DAO() {
-		ds = new Datasource();
+		ds =  new Datasource();
 	}
 	
 	// -------------------------------------------------------------------
@@ -56,33 +56,59 @@ public class DAO {
 		 * @param U
 		 *            os dados do usuário.
 		 */
-		public void create(Month month,Year year, Item item) {
+		public void create(Month month,Year year, ArrayList<Item> item) {
 			Connection con = ds.getConnection();
-			PreparedStatement stmp = null;
+			PreparedStatement ps;
+			ResultSet rs;
 			//String sql = "UPDATE names INNER JOIN addresses ON names.ID = addresses.ID SET names.name = 'Peter', addresses.address = 'Third Street' WHERE names.ID = 1";
+			for(Item i: item) {
 			try {
-				stmp = con.prepareStatement("INSERT INTO items(item_name,value,percentage) VALUES (?,?,?);"
-										+ "INSERT INTO year(year) VALUES (?);"
-										+ "INSERT INTO month(`month`,`received`,`previous`) VALUES (?,?,?);");
-				stmp.setString(1, item.getName());
-				stmp.setInt(2, item.getValue());
-				stmp.setInt(3, item.getPercentage());
-				stmp.setInt(4, year.getYear());
-				stmp.setString(5, month.getMonth());
-				stmp.setInt(6, month.getReceived());
-				stmp.setInt(7, month.getPrervious());
-				stmp.executeUpdate();
+				//year.setIdMonth(rs.getInt("id_item"));
+				PreparedStatement psYear = con.prepareStatement("INSERT INTO year(year,) VALUES (?);");
+				psYear.setInt(1, year.getYear());
+				psYear.executeUpdate();
+				ps = ds.getConnection().prepareStatement("SELECT `idyear` FROM year where year ="+year.getIdYear());
+				rs = ps.executeQuery();
+				month.setIdYear(rs.getInt("idyear"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			try {
+				PreparedStatement psMonth = con.prepareStatement("INSERT INTO month(`month`,`received`,`previous`,`year_idyear`) VALUES (?,?,?,?);");
+				psMonth.setString(1, month.getMonth());
+				psMonth.setInt(2, month.getReceived());
+				psMonth.setInt(3, month.getPrervious());
+				psMonth.setInt(4, month.getIdYear());
+				psMonth.executeUpdate();
+				ps = ds.getConnection().prepareStatement("SELECT idmonth FROM month where year_idyear ="+month.getIdYear());
+				rs = ps.executeQuery();
+				i.setIdMonth(rs.getInt("idmonth"));
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			
+			try {
+				PreparedStatement psItem = con.prepareStatement("INSERT INTO items(item_name,value,percentage) VALUES (?,?,?);");
+				psItem.setString(1, i.getName());
+				psItem.setInt(2, i.getValue());
+				psItem.setInt(3, i.getPercentage());
+				psItem.executeUpdate();
+						
 				System.out.println("[Log] Sucesso!");
 			} catch (SQLException u) {
+				u.printStackTrace();
 				throw new RuntimeException(u);
 			} finally {
-				try {
-					con.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-					System.err.println("[ERRO!] Erro na Listagem " + e.getMessage());
-				}
+//				try {
+//					//con.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//					System.err.println("[ERRO!] Erro na Listagem " + e.getMessage());
+//				}
 			}
+			}
+		
 		}
 
 		public void Update(Month month,Year year, Item item) {

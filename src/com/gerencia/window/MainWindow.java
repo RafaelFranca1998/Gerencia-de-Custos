@@ -9,15 +9,12 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
+
+import com.gerencia.connection.Datasource;
+
 import javax.swing.JPopupMenu;
 import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.JMenuItem;
-import javax.swing.JList;
-import java.awt.ScrollPane;
+
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
@@ -125,6 +122,16 @@ public class MainWindow {
 		JComboBox comboBox_1 = new JComboBox();
 		comboBox_1.setBounds(82, 109, 100, 20);
 		main_frame.getContentPane().add(comboBox_1);
+		
+		JButton btnConectar = new JButton("Conectar");
+		btnConectar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Datasource ds =  new Datasource();
+				ds.getConexaoMySQL();
+			}
+		});
+		btnConectar.setBounds(121, 496, 89, 23);
+		main_frame.getContentPane().add(btnConectar);
 	}
 	private static void addPopup(Component component, final JPopupMenu popup) {
 	}

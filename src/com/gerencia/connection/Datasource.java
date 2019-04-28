@@ -1,54 +1,111 @@
 package com.gerencia.connection;
 
-
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Datasource {
-	
-	private String hostname;
-	private int port;
-	private String database;
-	private String username;
-	private String password;
-	
-	private Connection conexao;
-	
+
+	public static String status = "Não conectou...";
+
+	// Método Construtor da Classe//
+
 	public Datasource() {
-		try {
-			
-			hostname = "localhost";
-			port = 3306;
-			database = "cost_management_db";
-			username = "root";
-			password = "32612421";
-
-			String url = "jdbc:mysql://" + hostname + ":" + port + "/" + database + "?useTimezone=true&serverTimezone=UTC?useSSL=false";
-			DriverManager.getConnection(url, username, password);
-			System.out.println("Conexao Efetuada!");
-		} catch (SQLException e) {
-			System.out.println("Não Conectou" + e.getMessage());
-		} catch (Exception e) {
-			System.out.println("Erro Diverso" + e.getMessage());
-		}
-	}
-	
-	public Connection getConnection() {
-		return conexao;
 
 	}
 
-	public void closeConnection() {
+	// Método de Conexão//
+
+	public static java.sql.Connection getConexaoMySQL() {
+
+		Connection connection = null; // atributo do tipo Connection
+
 		try {
-			conexao.close();
-			System.out.println("Conexão Encerrada!");
+
+			// Carregando o JDBC Driver padrão
+
+			String driverName = "com.mysql.cj.jdbc.Driver";
+
+			Class.forName(driverName);
+
+			// Configurando a nossa conexão com um banco de dados//
+
+			String serverName = "localhost"; // caminho do servidor do BD
+
+			String mydatabase = "cost_management_db"; // nome do seu banco de dados
+
+			String url = "jdbc:mysql://" + serverName + "/" + mydatabase;
+
+			String username = "root"; // nome de um usuário de seu BD
+
+			String password = "32612421"; // sua senha de acesso
+
+			connection = DriverManager.getConnection(url, username, password);
+
+			// Testa sua conexão//
+
+			if (connection != null) {
+
+				status = ("STATUS--->Conectado com sucesso!");
+
+			} else {
+
+				status = ("STATUS--->Não foi possivel realizar conexão");
+			}
+
+			return connection;
+
+		} catch (ClassNotFoundException e) { // Driver não encontrado
+
+			System.out.println("O driver expecificado nao foi encontrado.");
+
+			return null;
+
 		} catch (SQLException e) {
-			System.out.println("Não Fechou a Conexão: " + e.getMessage());
-		} catch (Exception e) {
-			System.out.println("Erro Diverso: " + e.getMessage());
+
+			// Não conseguindo se conectar ao banco
+
+			System.out.println("Nao foi possivel conectar ao Banco de Dados.");
+
+			return null;
 
 		}
+
+	}
+
+	// Método que retorna o status da sua conexão//
+
+	public static String statusConection() {
+
+		return status;
+
+	}
+
+	// Método que fecha sua conexão//
+
+	public static boolean FecharConexao() {
+
+		try {
+
+			Datasource.getConexaoMySQL().close();
+
+			return true;
+
+		} catch (SQLException e) {
+
+			return false;
+
+		}
+
+	}
+
+	// Método que reinicia sua conexão//
+
+	public static java.sql.Connection ReiniciarConexao() {
+
+		FecharConexao();
+
+		return Datasource.getConexaoMySQL();
+
 	}
 }

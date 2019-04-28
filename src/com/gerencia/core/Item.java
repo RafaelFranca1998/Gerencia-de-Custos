@@ -3,6 +3,8 @@ package com.gerencia.core;
 public class Item {
 	private String name;
 	private int id;
+	private int idYear;
+	private int idMonth;
 	private int value;
 	private int percentage;
 	
@@ -31,7 +33,17 @@ public class Item {
 	public void setPercentage(int percentage) {
 		this.percentage = percentage;
 	}
-	
-	
+	public int getIdYear() {
+		return idYear;
+	}
+	public void setIdYear(int idYear) {
+		this.idYear = idYear;
+	}
+	public int getIdMonth() {
+		return idMonth;
+	}
+	public void setIdMonth(int idMonth) {
+		this.idMonth = idMonth;
+	}
 	
 }

@@ -15,25 +15,39 @@ import com.gerencia.core.Year;
 import javax.swing.JButton;
 import java.awt.Choice;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.ItemEvent;
 
 public class AddMonth {
 
 	private JFrame add_Month_Frame;
 	private JTable tableAddMonth;
 	private JTextField txtFieldReceived;
-	private JTextField textFieldPrevious;
+	private JTextField txtFieldPrevious;
 	private JTextField txtAddName;
 	private JTextField txtAddValue;
+	
+	private Choice choiceMonth;
+	private Choice choiceYear;
+	
+	private JButton btnCancel;
 	
 	private Item item;
 	private Month month;
 	private Year year;
+	
+	
+	private ArrayList<Item> itemList;
 
 	/**
 	 * Create the application.
@@ -42,7 +56,7 @@ public class AddMonth {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					item = new Item();
+					itemList =  new ArrayList<>();
 					month = new Month();
 					year = new Year();
 					initialize();
@@ -88,30 +102,40 @@ public class AddMonth {
 		JButton btnSave = new JButton("Salvar");
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				DAO dao =  new DAO();
-				item.setName("Pascoa");
-				item.setPercentage(10);
-				item.setValue(300);
-				month.setMonth("Agosto");
+				month.setMonth(choiceMonth.getItem(choiceMonth.getSelectedIndex()));
 				month.setPrervious(200);
-				month.setReceived(400);
-				year.setYear(2019);
-				dao.create(month, year, item);
+				addMonth(year, month, itemList);
 			}
 		});
 		btnSave.setBounds(583, 387, 89, 23);
 		add_Month_Frame.getContentPane().add(btnSave);
 		
-		JButton btnCancel = new JButton("Cancelar");
+		btnCancel = new JButton("Cancelar");
 		btnCancel.setBounds(700, 387, 89, 23);
 		add_Month_Frame.getContentPane().add(btnCancel);
 		
-		Choice choiceYear = new Choice();
+		choiceYear = new Choice();
+		choiceYear.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+				year.setYear(Integer.parseInt(choiceYear.getSelectedItem()));
+			}
+		});
 		choiceYear.setBounds(550, 110, 99, 20);
+		for(int i = 2017; i< 2100; i++ ) {
+			choiceYear.add(Integer.toString(i));
+		}
 		add_Month_Frame.getContentPane().add(choiceYear);
 		
-		Choice choiceMonth = new Choice();
+		choiceMonth = new Choice();
+		choiceMonth.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				month.setMonth((choiceMonth.getSelectedItem()));
+			}
+		});
 		choiceMonth.setBounds(550, 146, 99, 20);
+		for(int i = 0; i < Month.MONTHLIST.length;i++) {
+			choiceMonth.add(Month.MONTHLIST[i]);
+		}
 		add_Month_Frame.getContentPane().add(choiceMonth);
 		
 		JLabel lblAno = new JLabel("Ano");
@@ -131,14 +155,24 @@ public class AddMonth {
 		add_Month_Frame.getContentPane().add(lblValorAnterior);
 		
 		txtFieldReceived = new JTextField();
+		txtFieldReceived.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				month.setReceived(Integer.parseInt(txtFieldReceived.getText()));
+			}
+		});
 		txtFieldReceived.setBounds(550, 182, 99, 20);
 		add_Month_Frame.getContentPane().add(txtFieldReceived);
 		txtFieldReceived.setColumns(10);
 		
-		textFieldPrevious = new JTextField();
-		textFieldPrevious.setBounds(550, 220, 99, 20);
-		add_Month_Frame.getContentPane().add(textFieldPrevious);
-		textFieldPrevious.setColumns(10);
+		txtFieldPrevious = new JTextField();
+		txtFieldPrevious.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				month.setPrervious(Integer.parseInt(txtFieldPrevious.getText()));
+			}
+		});
+		txtFieldPrevious.setBounds(550, 220, 99, 20);
+		add_Month_Frame.getContentPane().add(txtFieldPrevious);
+		txtFieldPrevious.setColumns(10);
 		
 		JSeparator separator = new JSeparator();
 		separator.setBounds(522, 87, 267, 14);
@@ -179,12 +213,50 @@ public class AddMonth {
 		txtAddValue.setBounds(245, 283, 208, 20);
 		add_Month_Frame.getContentPane().add(txtAddValue);
 		txtAddValue.setColumns(10);
+		txtAddValue.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+					try {
+						if (txtAddName.getText().equals("")||txtAddValue.getText().equals("")) {
+							throw new Exception();
+						}
+						addItem();
+					} catch (Exception a) {
+						JOptionPane.showMessageDialog(tableAddMonth, "Erro ao adicionar, Tente novamente.",
+								"Erro ao adicionar!", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+		});
 		
 		JLabel lblValorr = new JLabel("Valor (R$)");
 		lblValorr.setBounds(245, 258, 99, 14);
 		add_Month_Frame.getContentPane().add(lblValorr);
 		
 		JButton btnAdd = new JButton("Adicionar");
+		btnAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				addItem();
+			}
+		});
+		
+		btnAdd.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+					try {
+						if (txtAddName.getText().equals("")||txtAddValue.getText().equals("")) {
+							throw new Exception();
+						}
+						addItem();
+					} catch (Exception a) {
+						JOptionPane.showMessageDialog(tableAddMonth, "Erro ao adicionar, Tente novamente.",
+								"Erro ao adicionar!", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+		});
 		btnAdd.setBounds(193, 325, 89, 23);
 		add_Month_Frame.getContentPane().add(btnAdd);
 		
@@ -199,8 +271,26 @@ public class AddMonth {
 		add_Month_Frame.getContentPane().add(lblDadosDoMs);
 	}
 
+	private void addItem() {
+		item =  new Item();
+		item.setName(txtAddName.getText());
+		item.setValue(Integer.valueOf(txtAddValue.getText()));
+		itemList.add(item);
+		updateResultadoList();
+		txtAddValue.setText("");
+		txtAddName.setText("");
+	}
 	
-	private void addMonth() {
-		
+	private void addMonth(Year y,Month m ,ArrayList<Item> i) {
+		DAO dao =  new DAO();
+		dao.create(m, y, i);
+	}
+	
+	private void updateResultadoList() {
+		DefaultTableModel modelo = (DefaultTableModel) tableAddMonth.getModel();// obtem o modelo da tabela
+		modelo.setNumRows(0); // zera a tabela
+		for (Item s : itemList) { // percorre a lista de resultados
+			modelo.addRow(new Object[] { s.getName(),s.getValue()+" R$" }); //adiciona nova linha a tabela
+		}
 	}
 }

@@ -12,11 +12,11 @@ import com.gerencia.core.Year;
 
 public class DAO {
 	
-	private Datasource ds;
+	private DataSource ds;
 
 	
 	public DAO() {
-		ds =  new Datasource();
+		ds =  new DataSource();
 	}
 	
 	// -------------------------------------------------------------------
@@ -28,7 +28,7 @@ public class DAO {
 		 */
 		public ArrayList<Item> listItems () {
 			try {
-				PreparedStatement ps = ds.getConnection().prepareStatement("SELECT * FROM items");
+				PreparedStatement ps = ds.getConexao().prepareStatement("SELECT * FROM items");
 				ResultSet rs = ps.executeQuery();
 				ArrayList<Item> Lista = new ArrayList<Item>();
 				while (rs.next()) {
@@ -44,7 +44,7 @@ public class DAO {
 			} catch (Exception e) {
 				System.err.println("[ERRO!] ERRO GERAL: " + e.getMessage());
 			} finally {
-				ds.closeConnection();
+				ds.fecharConexao();;
 			}
 			return null;
 		}
@@ -57,7 +57,7 @@ public class DAO {
 		 *            os dados do usuário.
 		 */
 		public void create(Month month,Year year, ArrayList<Item> item) {
-			Connection con = ds.getConnection();
+			Connection con = ds.getConexao();
 			PreparedStatement ps;
 			ResultSet rs;
 			//String sql = "UPDATE names INNER JOIN addresses ON names.ID = addresses.ID SET names.name = 'Peter', addresses.address = 'Third Street' WHERE names.ID = 1";
@@ -67,7 +67,7 @@ public class DAO {
 				PreparedStatement psYear = con.prepareStatement("INSERT INTO year(year,) VALUES (?);");
 				psYear.setInt(1, year.getYear());
 				psYear.executeUpdate();
-				ps = ds.getConnection().prepareStatement("SELECT `idyear` FROM year where year ="+year.getIdYear());
+				ps = ds.getConexao().prepareStatement("SELECT `idyear` FROM year where year ="+year.getIdYear());
 				rs = ps.executeQuery();
 				month.setIdYear(rs.getInt("idyear"));
 			} catch (Exception e) {
@@ -81,7 +81,7 @@ public class DAO {
 				psMonth.setInt(3, month.getPrervious());
 				psMonth.setInt(4, month.getIdYear());
 				psMonth.executeUpdate();
-				ps = ds.getConnection().prepareStatement("SELECT idmonth FROM month where year_idyear ="+month.getIdYear());
+				ps = ds.getConexao().prepareStatement("SELECT idmonth FROM month where year_idyear ="+month.getIdYear());
 				rs = ps.executeQuery();
 				i.setIdMonth(rs.getInt("idmonth"));
 			}catch(Exception e) {
@@ -112,7 +112,7 @@ public class DAO {
 		}
 
 		public void Update(Month month,Year year, Item item) {
-			Connection con = ds.getConnection();
+			Connection con = ds.getConexao();
 			PreparedStatement stmp = null;
 			try {
 				stmp = con.prepareStatement(
@@ -133,7 +133,7 @@ public class DAO {
 				throw new RuntimeException(u);
 			} finally {
 				try {
-					ds.closeConnection();
+					ds.getConexao();
 					con.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
@@ -151,7 +151,7 @@ public class DAO {
 		 *            ID a ser Deletado.
 		 */
 		public void delete(Item U) {
-			Connection con = ds.getConnection();
+			Connection con = ds.getConexao();
 			PreparedStatement stmp = null;
 			try {
 				stmp = con.prepareStatement("DELETE FROM alunos WHERE id = ?");

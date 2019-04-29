@@ -1,22 +1,20 @@
 package com.gerencia.window;
 
-import java.awt.EventQueue;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import javax.swing.table.DefaultTableModel;
 
-import com.gerencia.connection.Datasource;
+import com.gerencia.connection.DataSource;
 
-import javax.swing.JPopupMenu;
-import java.awt.Component;
-
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 
 public class MainWindow {
 
@@ -25,26 +23,11 @@ public class MainWindow {
 	private JTable table_2;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainWindow window = new MainWindow();
-					window.main_frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the application.
 	 */
 	public MainWindow() {
 		initialize();
+		
 	}
 
 	/**
@@ -126,12 +109,23 @@ public class MainWindow {
 		JButton btnConectar = new JButton("Conectar");
 		btnConectar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Datasource ds =  new Datasource();
-				ds.getConexaoMySQL();
+				try {		
+				//FIXME 
+						System.out.println("Clicou");
+						DataSource ds =  new DataSource();
+						ds.getConexao();
+						//XXX
+						//Datasource.FecharConexao();
+						//TODO
+				}catch (Exception e) {
+					// TODO: handle exception
+				}
+				
 			}
 		});
 		btnConectar.setBounds(121, 496, 89, 23);
 		main_frame.getContentPane().add(btnConectar);
+		main_frame.setVisible(true);
 	}
 	private static void addPopup(Component component, final JPopupMenu popup) {
 	}

@@ -6,7 +6,6 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import com.gerencia.connection.DAO;
-import com.gerencia.connection.DAO.OnCompleteListener;
 import com.gerencia.core.Item;
 import com.gerencia.core.Month;
 import com.gerencia.core.Year;
@@ -263,23 +262,12 @@ public class AddMonth {
 	}
 
 	private void fillChoiceYear() {
-		DAO dao = new DAO();
-		ArrayList<Year> usedListYear = dao.listYear();
-		ArrayList<Month> usedListMonth = dao.listMonth(selectedYear);
 		ArrayList<Integer> listYear = new ArrayList<>();
 
 		for (int i = 2016; i < 2100; i++) {
 			listYear.add(i);
 		}
 
-	/**	for (int i = 0; i < usedListYear.size(); i++) {
-			for (int j = 0; j < listYear.size(); j++) {
-				if (usedListYear.get(i).getYear() == listYear.get(j)) {
-					listYear.remove(j);
-				}
-			}
-		}
-**/
 		choiceYear.add("Selecione");;
 		for (int i = 0; i < listYear.size(); i++) {
 			choiceYear.add(Integer.toString(listYear.get(i)));

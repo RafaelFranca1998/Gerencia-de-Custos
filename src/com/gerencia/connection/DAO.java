@@ -62,7 +62,7 @@ public class DAO {
 		DataSource ds = new DataSource();
 		PreparedStatement ps;
 		try {
-			ps = ds.getConexao().prepareStatement("SELECT * FROM year  ORDER BY year ASC");
+			ps = ds.getConexao().prepareStatement("SELECT * FROM year ORDER BY year ASC");
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				Year year = new Year();
@@ -235,14 +235,14 @@ public class DAO {
 				}
 				
 				PreparedStatement psItem = con.prepareStatement(
-						"INSERT INTO items(item_name,value,percentage,month_idmonth,plots) VALUES (?,?,?,?,?);");
+						"INSERT INTO items(item_name,value,month_idmonth,plots) VALUES (?,?,?,?);");
 				System.out.println("[Log] nome do item" + i.getName());
 				psItem.setString(1, i.getName());
 				System.out.println("[Log] Valor do item" + i.getValue());
 				psItem.setInt(2, i.getValue());
 				System.out.println("[Log] id do mes" + i.getIdMonth());
-				psItem.setInt(4, i.getIdMonth());
-				psItem.setInt(5, i.getPlots());
+				psItem.setInt(3, i.getIdMonth());
+				psItem.setInt(4, i.getPlots());
 				psItem.executeUpdate();
 				System.out.println("[Log] Sucesso!");
 			} catch (SQLException u) {
@@ -256,16 +256,49 @@ public class DAO {
 			e.printStackTrace();
 			System.err.println("[ERRO!] Erro na Listagem " + e.getMessage());
 		} finally {
+			System.out.println("Complete");
 			onCompleteListener.onComplete();
 		}
 
 	}
 
+	public void addItem( ArrayList<Item> itemList) {
+		Connection con = ds.getConexao();
+		for (Item i : itemList) {
+			try {
+				PreparedStatement psItem = con.prepareStatement(
+						"INSERT INTO items(item_name,value,month_idmonth,plots) VALUES (?,?,?,?);");
+				System.out.println("[Log] nome do item" + i.getName());
+				psItem.setString(1, i.getName());
+				System.out.println("[Log] Valor do item" + i.getValue());
+				psItem.setInt(2, i.getValue());
+				System.out.println("[Log] id do mes" + i.getIdMonth());
+				psItem.setInt(3, i.getIdMonth());
+				psItem.setInt(4, i.getPlots());
+				psItem.executeUpdate();
+				System.out.println("[Log] Sucesso!");
+			} catch (SQLException u) {
+				u.printStackTrace();
+				throw new RuntimeException(u);
+			}
+		}
+		try {
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("[ERRO!] Erro na Listagem " + e.getMessage());
+		} finally {
+			System.out.println("Complete");
+			onCompleteListener.onComplete();
+		}
+
+	}
+	
 	public void UpdateItem(Item item) {
 		Connection con = ds.getConexao();
 		PreparedStatement stmp = null;
 		try {
-			String sql = "UPDATE items SET item_name = ?, value = ?, month_idmonth = ?, percentage = ?, plots = ? WHERE id = ?";
+			String sql = "UPDATE items SET item_name = ?, value = ?, month_idmonth = ?, plots = ? WHERE id = ?";
 			stmp = con.prepareStatement(sql);
 			  stmp.setString(1, item.getName()); 
 			  stmp.setInt(2, item.getValue());

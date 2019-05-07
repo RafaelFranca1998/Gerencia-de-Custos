@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -189,6 +190,15 @@ public class MainWindow {
 		main_frame.getContentPane().add(choiceYear);
 		
 		JButton btnAddItem = new JButton("Adicionar Item");
+		btnAddItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (idMonth != 0) {
+					new AddItemWindow(idMonth);					
+				} else {
+					JOptionPane.showMessageDialog(scrollItems, "Selecionar Mês.", "Mês Não Selecionado", JOptionPane.INFORMATION_MESSAGE);
+				}
+			}
+		});
 		btnAddItem.setBounds(160, 258, 130, 23);
 		main_frame.getContentPane().add(btnAddItem);
 		main_frame.setVisible(true);

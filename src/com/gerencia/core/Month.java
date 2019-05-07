@@ -1,6 +1,9 @@
 package com.gerencia.core;
 
-public class Month {
+import com.gerencia.interfaces.Container;
+import com.gerencia.interfaces.Iterator;
+
+public class Month implements Container {
 	
 	public static final String[] MONTHLIST = {"Janeiro","Fevereiro","Março","Abril",
 											  "Maio","Junho","Julho","Agosto","Setembro",
@@ -30,6 +33,10 @@ public class Month {
 	public void setPrervious(int prervious) {
 		this.prervious = prervious;
 	}
+	
+	public void setIdMonth(int idMonth) {
+		this.idMonth = idMonth;
+	}
 	public int getIdMonth() {
 		return idMonth;
 	}
@@ -40,5 +47,33 @@ public class Month {
 	public void setIdYear(int idYear) {
 		this.idYear = idYear;
 	}
+	@Override
+	public Iterator getIterator() {
+		// TODO Auto-generated method stub
+		return new MonthIterator();
+	}
+	
+	  private class MonthIterator implements Iterator {
+
+	      int index;
+
+	      @Override
+	      public boolean hasNext() {
+	      
+	         if(index < MONTHLIST.length){
+	            return true;
+	         }
+	         return false;
+	      }
+
+	      @Override
+	      public Object next() {
+	      
+	         if(this.hasNext()){
+	            return MONTHLIST[index++];
+	         }
+	         return null;
+	      }		
+	   }
 		
 }

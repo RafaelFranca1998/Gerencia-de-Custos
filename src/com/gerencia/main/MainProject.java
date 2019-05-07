@@ -5,7 +5,7 @@ import com.gerencia.window.MainWindow;
 public class MainProject {
 
 	public static void main(String[] args) {
-		MainWindow mw =  new MainWindow();
+		new MainWindow();
 	}
 	
 }

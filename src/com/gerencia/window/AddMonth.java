@@ -1,16 +1,16 @@
 package com.gerencia.window;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import com.gerencia.connection.DAO;
+import com.gerencia.connection.DAO.OnCompleteListener;
 import com.gerencia.core.Item;
 import com.gerencia.core.Month;
 import com.gerencia.core.Year;
+import com.gerencia.interfaces.Iterator;
 
 import javax.swing.JButton;
 import java.awt.Choice;
@@ -46,16 +46,25 @@ public class AddMonth {
 	private Month month;
 	private Year year;
 
+	private int selectedYear;
+	private final int firstYear;
+	private String selectedMonth;
+
 	private ArrayList<Item> itemList;
+	private JTextField txtPlots;
 
 	/**
 	 * Create the application.
 	 */
 	public AddMonth() {
-
 		itemList = new ArrayList<>();
 		month = new Month();
 		year = new Year();
+
+		firstYear = 2016;
+		selectedYear = firstYear;
+		selectedMonth = Month.MONTHLIST[1];
+
 		initialize();
 		add_Month_Frame.setVisible(true);
 
@@ -85,9 +94,9 @@ public class AddMonth {
 		JButton btnSave = new JButton("Salvar");
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				month.setMonth(choiceMonth.getItem(choiceMonth.getSelectedIndex()));
-				month.setPrervious(200);
-				addMonth(year, month, itemList);
+				if (addMonth(year, month, itemList)) {
+					add_Month_Frame.dispose();
+				}
 			}
 		});
 		btnSave.setBounds(583, 387, 89, 23);
@@ -100,25 +109,25 @@ public class AddMonth {
 		choiceYear = new Choice();
 		choiceYear.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				year.setYear(Integer.parseInt(choiceYear.getSelectedItem()));
+				selectedYear = Integer.parseInt(choiceYear.getSelectedItem());
+				fillChoiceMonth();
 			}
 		});
 		choiceYear.setBounds(550, 110, 99, 20);
-		for (int i = 2017; i < 2100; i++) {
-			choiceYear.add(Integer.toString(i));
-		}
+
+		fillChoiceYear();
+
 		add_Month_Frame.getContentPane().add(choiceYear);
 
 		choiceMonth = new Choice();
 		choiceMonth.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
-				month.setMonth((choiceMonth.getSelectedItem()));
+				selectedMonth = choiceMonth.getSelectedItem();
 			}
 		});
 		choiceMonth.setBounds(550, 146, 99, 20);
-		for (int i = 0; i < Month.MONTHLIST.length; i++) {
-			choiceMonth.add(Month.MONTHLIST[i]);
-		}
+		
+		
 		add_Month_Frame.getContentPane().add(choiceMonth);
 
 		JLabel lblAno = new JLabel("Ano");
@@ -138,21 +147,11 @@ public class AddMonth {
 		add_Month_Frame.getContentPane().add(lblValorAnterior);
 
 		txtFieldReceived = new JTextField();
-		txtFieldReceived.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				month.setReceived(Integer.parseInt(txtFieldReceived.getText()));
-			}
-		});
 		txtFieldReceived.setBounds(550, 182, 99, 20);
 		add_Month_Frame.getContentPane().add(txtFieldReceived);
 		txtFieldReceived.setColumns(10);
 
 		txtFieldPrevious = new JTextField();
-		txtFieldPrevious.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				month.setPrervious(Integer.parseInt(txtFieldPrevious.getText()));
-			}
-		});
 		txtFieldPrevious.setBounds(550, 220, 99, 20);
 		add_Month_Frame.getContentPane().add(txtFieldPrevious);
 		txtFieldPrevious.setColumns(10);
@@ -240,7 +239,7 @@ public class AddMonth {
 				}
 			}
 		});
-		btnAdd.setBounds(193, 325, 89, 23);
+		btnAdd.setBounds(209, 367, 89, 23);
 		add_Month_Frame.getContentPane().add(btnAdd);
 
 		JLabel lblItensNaLista = new JLabel("Itens na Lista");
@@ -252,28 +251,136 @@ public class AddMonth {
 		lblDadosDoMs.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblDadosDoMs.setBounds(522, 46, 132, 38);
 		add_Month_Frame.getContentPane().add(lblDadosDoMs);
+		
+		txtPlots = new JTextField();
+		txtPlots.setColumns(10);
+		txtPlots.setBounds(57, 336, 166, 20);
+		add_Month_Frame.getContentPane().add(txtPlots);
+		
+		JLabel lblParcelas = new JLabel("Parcelas");
+		lblParcelas.setBounds(57, 314, 68, 14);
+		add_Month_Frame.getContentPane().add(lblParcelas);
+	}
+
+	private void fillChoiceYear() {
+		DAO dao = new DAO();
+		ArrayList<Year> usedListYear = dao.listYear();
+		ArrayList<Month> usedListMonth = dao.listMonth(selectedYear);
+		ArrayList<Integer> listYear = new ArrayList<>();
+
+		for (int i = 2016; i < 2100; i++) {
+			listYear.add(i);
+		}
+
+	/**	for (int i = 0; i < usedListYear.size(); i++) {
+			for (int j = 0; j < listYear.size(); j++) {
+				if (usedListYear.get(i).getYear() == listYear.get(j)) {
+					listYear.remove(j);
+				}
+			}
+		}
+**/
+		choiceYear.add("Selecione");;
+		for (int i = 0; i < listYear.size(); i++) {
+			choiceYear.add(Integer.toString(listYear.get(i)));
+		}
+
+	}
+	private void fillChoiceMonth() {
+		DAO dao = new DAO();
+		ArrayList<Month> usedListMonth = dao.listMonth(Integer.toString(selectedYear));
+		ArrayList<String> list = new ArrayList<>();
+		choiceMonth.removeAll();
+		
+		
+		Month namesRepository = new Month();
+		
+		
+
+	      for(Iterator iter = namesRepository.getIterator(); iter.hasNext();){
+	         list.add((String)iter.next());
+	      } 
+	      
+		for (int i = 0; i < usedListMonth.size(); i++) {
+			for (int j = 0; j < list.size(); j++) {
+				if (usedListMonth.get(i).getMonth().equals( list.get(j))) {
+					list.remove(j);
+				}
+			}
+		}
+		
+		choiceMonth.add("Selecione");
+		
+		for (int i = 0; i < list.size(); i++) {
+			choiceMonth.add(list.get(i));
+		}
 	}
 
 	private void addItem() {
 		item = new Item();
 		item.setName(txtAddName.getText());
 		item.setValue(Integer.valueOf(txtAddValue.getText()));
+		if (!txtPlots.getText().equals("")) {
+			item.setPlots(Integer.parseInt(txtPlots.getText()));			
+		}
 		itemList.add(item);
 		updateResultadoList();
 		txtAddValue.setText("");
 		txtAddName.setText("");
+		txtPlots.setText("");
 	}
 
-	private void addMonth(Year y, Month m, ArrayList<Item> i) {
-		DAO dao = new DAO();
-		dao.create(m, y, i);
+	private boolean addMonth(Year y, Month m, ArrayList<Item> i) {
+		try {
+			if (!txtFieldReceived.getText().equals("") && !txtFieldPrevious.getText().equals("")) {
+				month.setPrervious(Integer.parseInt(txtFieldPrevious.getText()));
+				month.setReceived(Integer.parseInt(txtFieldReceived.getText()));
+				month.setMonth(selectedMonth);
+				year.setYear(selectedYear);
+			} else {
+				throw new StringIndexOutOfBoundsException();
+			}
+			DAO dao = new DAO();
+			dao.create(m, y, i);
+			addCompleteListener.onComplete();
+			return true;
+		} catch (StringIndexOutOfBoundsException S) {
+			JOptionPane.showMessageDialog(add_Month_Frame, "Campo vazio, Preencha todos os campos.", "Erro",
+					JOptionPane.ERROR_MESSAGE);
+			return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	private void updateResultadoList() {
-		DefaultTableModel modelo = (DefaultTableModel) tableAddMonth.getModel();// obtem o modelo da tabela
-		modelo.setNumRows(0); // zera a tabela
-		for (Item s : itemList) { // percorre a lista de resultados
-			modelo.addRow(new Object[] { s.getName(), s.getValue() + " R$" }); // adiciona nova linha a tabela
+		DefaultTableModel modelo = (DefaultTableModel) tableAddMonth.getModel();
+		modelo.setNumRows(0);
+		for (Item s : itemList) {
+			modelo.addRow(new Object[] { s.getName(), s.getValue() + " R$" });
 		}
 	}
+	
+	// #####################Listener################################################
+		private OnAddCompleteListener addCompleteListener;
+
+		/**
+		 * Listener da classe.
+		 * 
+		 * @param addCompleteListener
+		 */
+		public void setOnCompleteListener(OnAddCompleteListener addCompleteListener) {
+			this.addCompleteListener = addCompleteListener; // listener da classe.
+		}
+
+		/**
+		 * interface a ser inplementada toda vez que o setOnCompleteListener for usado.
+		 * 
+		 * @author Rafael
+		 *
+		 */
+		public interface OnAddCompleteListener {// interface a ser executada.
+			public void onComplete();
+		}
 }

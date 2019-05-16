@@ -16,15 +16,16 @@ public class DataSource {
 	public DataSource() {
 		try {
 			hostname = "localhost";
-			port = 3306;
+			port = 5432;
 			database = "cost_management_db";
-			username = "root";
+			username = "postgres";
 			password = "32612421";
 
-			String url = "jdbc:mysql://" + hostname + ":" + port + "/" + database+"?useTimezone=true&serverTimezone=UTC";
+			String url = "jdbc:postgresql://" + hostname + ":" + port + "/" + database+"?useTimezone=true&serverTimezone=UTC";
 			conexao = DriverManager.getConnection(url, username, password);
 			System.out.println("Conexao Efetuada!");
 		} catch (SQLException e) {
+			e.printStackTrace();
 			System.out.println("Não Conectou" + e.getMessage());
 		} catch (Exception e) {
 			System.out.println("Erro Diverso" + e.getMessage());
